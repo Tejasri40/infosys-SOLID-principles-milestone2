@@ -1,6 +1,17 @@
-venv/
+# Python
 __pycache__/
 *.pyc
-*.pth
-.env
-.streamlit/
+*.pyo
+
+# Virtual environment
+venv/
+
+# VS Code
+.vscode/
+
+# Data & DB
+data/
+*.db
+
+# OS files
+.DS_Store
