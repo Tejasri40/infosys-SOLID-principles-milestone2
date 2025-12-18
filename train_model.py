@@ -4,19 +4,22 @@ from torchvision import datasets, transforms, models
 from torch.utils.data import DataLoader
 import os
 
-# Paths
-DATA_DIR = "data/ricedataset"      # or pulse dataset folder
+# ==========================
+# CONFIG
+# ==========================
+DATA_DIR = "data/ricedataset"
 MODEL_SAVE_PATH = "models/rice_model.pth"
 
-# Hyperparameters
+
 EPOCHS = 20
 BATCH_SIZE = 16
 LR = 0.001
 
+
 def train_model():
-    print("\n========================================")
-    print(" LOADING DATASET ")
-    print("========================================")
+    print("\n" + "=" * 45)
+    print("LOADING DATASET")
+    print("=" * 45)
 
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
@@ -24,22 +27,23 @@ def train_model():
     ])
 
     dataset = datasets.ImageFolder(DATA_DIR, transform=transform)
+
     train_size = int(0.8 * len(dataset))
     val_size = len(dataset) - train_size
-    train_data, val_data = torch.utils.data.random_split(dataset, [train_size, val_size])
+    train_data, val_data = torch.utils.data.random_split(
+        dataset, [train_size, val_size]
+    )
+
+    print(f"Training samples: {len(train_data)}")
+    print(f"Validation samples: {len(val_data)}\n")
+
+    print(f"Model will train for {len(dataset.classes)} classes: {dataset.classes}\n")
 
     train_loader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True)
     val_loader = DataLoader(val_data, batch_size=BATCH_SIZE)
 
-    print(f"Training samples: {len(train_data)}")
-    print(f"Validation samples: {len(val_data)}")
-
-    num_classes = len(dataset.classes)
-    print(f"\nModel will train for {num_classes} classes:", dataset.classes)
-
-    # Model
-    model = models.resnet18(pretrained=True)
-    model.fc = nn.Linear(model.fc.in_features, num_classes)
+    model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
+    model.fc = nn.Linear(model.fc.in_features, len(dataset.classes))
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model.to(device)
@@ -47,67 +51,73 @@ def train_model():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=LR)
 
-    best_acc = 0
-    best_epoch = 0
+    best_val_acc = 0.0
+    best_state = None
 
-    print("\n========================================")
-    print(" STARTING TRAINING ")
-    print("========================================")
+    print("=" * 45)
+    print("STARTING TRAINING")
+    print("=" * 45)
 
     for epoch in range(EPOCHS):
+        # ---------------- TRAIN ----------------
         model.train()
-        total_loss = 0
+        train_loss = 0.0
         correct = 0
+        total = 0
 
         for images, labels in train_loader:
             images, labels = images.to(device), labels.to(device)
 
             optimizer.zero_grad()
-            output = model(images)
-            loss = criterion(output, labels)
+            outputs = model(images)
+            loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
 
-            total_loss += loss.item()
-            _, preds = torch.max(output, 1)
-            correct += torch.sum(preds == labels)
+            train_loss += loss.item()
+            _, preds = torch.max(outputs, 1)
+            correct += (preds == labels).sum().item()
+            total += labels.size(0)
 
-        train_acc = 100 * correct / len(train_data)
+        train_acc = 100 * correct / total
 
-        # Validation
+        # ---------------- VALIDATION ----------------
         model.eval()
-        val_correct = 0
-        val_loss = 0
+        val_loss = 0.0
+        correct = 0
+        total = 0
 
         with torch.no_grad():
             for images, labels in val_loader:
                 images, labels = images.to(device), labels.to(device)
-
-                output = model(images)
-                loss = criterion(output, labels)
+                outputs = model(images)
+                loss = criterion(outputs, labels)
 
                 val_loss += loss.item()
-                _, preds = torch.max(output, 1)
-                val_correct += torch.sum(preds == labels)
+                _, preds = torch.max(outputs, 1)
+                correct += (preds == labels).sum().item()
+                total += labels.size(0)
 
-        val_acc = 100 * val_correct / len(val_data)
+        val_acc = 100 * correct / total
 
+        # ---------------- LOG ----------------
         print(f"\nEpoch {epoch+1}/{EPOCHS}")
-        print(f"Train Loss: {total_loss:.4f} | Train Acc: {train_acc:.2f}%")
+        print(f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.2f}%")
         print(f"Val Loss: {val_loss:.4f} | Val Acc: {val_acc:.2f}%")
 
-        # Save Best Model
-        if val_acc > best_acc:
-            best_acc = val_acc
-            best_epoch = epoch + 1
-            torch.save(model.state_dict(), MODEL_SAVE_PATH)
-            print(f"✓ Best model saved! (Epoch {best_epoch}, Acc: {best_acc:.2f}%)")
+        # ---------------- SAVE BEST MODEL ----------------
+        if val_acc > best_val_acc:
+            best_val_acc = val_acc
+            best_state = model.state_dict()
 
-    print("\n========================================")
-    print(" TRAINING COMPLETE ")
-    print("========================================")
-    print(f"BEST ACCURACY: {best_acc:.2f}% at Epoch {best_epoch}")
-    print(f"Model saved at: {MODEL_SAVE_PATH}")
+            checkpoint = {
+                "model_state": best_state,
+                "classes": dataset.classes
+            }
+
+            torch.save(checkpoint, MODEL_SAVE_PATH)
+            print(f"✓ Best model saved! (Epoch {epoch+1}, Acc: {val_acc:.2f}%)")
+
 
 if __name__ == "__main__":
     train_model()

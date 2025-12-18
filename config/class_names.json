@@ -1,14 +1,4 @@
 {
-  "classes": [
-    "Healthy",
-    "Bacterial Leaf Blight",
-    "Brown Spot",
-    "Leaf Smut",
-    "Bacterial Leaf Streak",
-    "Sheath Blight",
-    "Tungro",
-    "Blast",
-    "Hispa",
-    "Leaf Scald"
-  ]
+   "rice": ["blast", "blight", "tungro"],
+   "pulse": ["bean_rust", "healthy", "leaf_spot"]
 }
