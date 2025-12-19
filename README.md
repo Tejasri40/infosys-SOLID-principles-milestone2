@@ -3,10 +3,15 @@
 Each module in the project has only one responsibility.
 
 app.py – User Interface (Streamlit)
+
 predict.py – Image preprocessing and prediction
+
 train_model.py – Model training
+
 auth_service.py – Authentication logic
+
 database.py – Database operations
+
 model_config.py – Model path configuration
 
 
@@ -68,5 +73,6 @@ High-level modules(app.py) do not depend on low-level modules directly.
 Both depend on abstractions(interfaces)
 
 Dependencies are provided using a service method (for example: get_prediction_service())
+
 
 
