@@ -1,4 +1,4 @@
-# 1) Single Responsibility Principle (SRP)
+**1) Single Responsibilty Principle (SRP)**
 
 Each module in the project has only one responsibility.
 
@@ -17,17 +17,22 @@ model_config.py – Model path configuration
 
 
 
-# 2) Open–Closed Principle (OCP)
+**2) Open/Closed Principle (OCP)**
 
 The system is open for extension but closed for modification.
 
 - New crops or models can be added in **model_config.py**
+- 
 - Existing prediction logic does not need to be changed
 
 Example:
+
 MODELS = {
+
     "Rice": "models/rice_model.pth",
+    
     "Pulse": "models/pulse_model.pth"
+    
 }
 
 
@@ -73,6 +78,7 @@ High-level modules(app.py) do not depend on low-level modules directly.
 Both depend on abstractions(interfaces)
 
 Dependencies are provided using a service method (for example: get_prediction_service())
+
 
 
 
