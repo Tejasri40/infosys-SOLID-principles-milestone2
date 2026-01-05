@@ -70,7 +70,7 @@ if page == "Disease Prediction":
     if uploaded is not None:
         from PIL import Image
 
-        # Image Preview (CENTER)
+    #image preview
         image = Image.open(uploaded)
         st.image(
             image,
