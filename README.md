@@ -5,6 +5,7 @@ Create a virtual environment:
 python -m venv venv
 
 source venv/bin/activate
+
 On Windows: venv\Scripts\activate
 
 Install dependencies:
@@ -149,6 +150,7 @@ High-level modules(app.py) do not depend on low-level modules directly.
 Both depend on abstractions(interfaces)
 
 Dependencies are provided using a service method (for example: get_prediction_service())
+
 
 
 
