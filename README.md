@@ -1,3 +1,19 @@
+**Installation**
+
+Create a virtual environment:
+
+python -m venv venv
+
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+Install dependencies:
+
+pip install -r requirements.txt
+
+Running the Application
+
+streamlit run app.py
+
 **Model Training & Testing**
 
 This milestone focuses on training and testing deep learning models for crop disease detection using image datasets. Two separate models were trained for Rice and Pulse (Bean) crops using Convolutional Neural Networks (ResNet-18).
@@ -132,6 +148,7 @@ High-level modules(app.py) do not depend on low-level modules directly.
 Both depend on abstractions(interfaces)
 
 Dependencies are provided using a service method (for example: get_prediction_service())
+
 
 
 
