@@ -12,7 +12,7 @@ source venv/bin/activate
 
 pip install -r requirements.txt
 
-Running the Application
+**Running the Application**
 
 streamlit run app.py
 
@@ -150,6 +150,7 @@ High-level modules(app.py) do not depend on low-level modules directly.
 Both depend on abstractions(interfaces)
 
 Dependencies are provided using a service method (for example: get_prediction_service())
+
 
 
 
